@@ -338,16 +338,6 @@ public class MinioUtils {
                     .filename(filePath)
                     .object(fileName)
                     .build());
-            /*final ObjectStat stat = minioClient.statObject(StatObjectArgs.builder().bucket(bucketName)
-                    .object(fileName).build());
-            response.setContentType(stat.contentType());
-            response.setCharacterEncoding(UTF8_ENCODING);
-            response.setHeader(CONTENT_DISPOSITION, ATTACHMENT_AND + URLEncoder.encode(fileName, UTF8_ENCODING));
-            InputStream is = minioClient.getObject(GetObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(fileName).build());
-            IOUtils.copy(is, response.getOutputStream());
-            is.close();*/
         } catch (ErrorResponseException e) {
             e.printStackTrace();
         } catch (InsufficientDataException e) {
