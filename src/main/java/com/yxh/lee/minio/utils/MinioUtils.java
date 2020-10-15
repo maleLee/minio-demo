@@ -9,8 +9,10 @@ import io.minio.errors.*;
 import io.minio.messages.Bucket;
 import io.minio.messages.Item;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.KeyGenerator;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,13 +44,12 @@ public class MinioUtils {
     private static MinioClient minioClient;
 
     /**
-     * @author Seven Lee
-     * @description
-     *      初始化minioClient对象
      * @param []
-     * @date 2020/10/13
      * @return void
      * @throws
+     * @author Seven Lee
+     * @description 初始化minioClient对象
+     * @date 2020/10/13
      **/
     @PostConstruct
     public void init() {
@@ -63,13 +64,12 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
-     *      检测指定bucket是否存在
      * @param [bucketName]
-     * @date 2020/10/13
      * @return boolean
      * @throws
+     * @author Seven Lee
+     * @description 检测指定bucket是否存在
+     * @date 2020/10/13
      **/
     public static boolean bucketExists(String bucketName) {
         BucketExistsArgs bucket = BucketExistsArgs.builder().bucket(bucketName).build();
@@ -100,13 +100,12 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
-     *      创建新的bucket
      * @param [bucketName]
-     * @date 2020/10/13
      * @return void
      * @throws
+     * @author Seven Lee
+     * @description 创建新的bucket
+     * @date 2020/10/13
      **/
     public static void createBucket(String bucketName) {
         boolean isExist = bucketExists(bucketName);
@@ -140,13 +139,12 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
-     *      获取所有的bucket
      * @param []
-     * @date 2020/10/13
      * @return java.util.List<io.minio.messages.Bucket>
      * @throws
+     * @author Seven Lee
+     * @description 获取所有的bucket
+     * @date 2020/10/13
      **/
     public static List<Bucket> getAllBuckets() {
         try {
@@ -176,13 +174,12 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
-     *      根据bucket名称获取bucket
      * @param [bucketName]
-     * @date 2020/10/13
      * @return java.util.Optional<io.minio.messages.Bucket>
      * @throws
+     * @author Seven Lee
+     * @description 根据bucket名称获取bucket
+     * @date 2020/10/13
      **/
     public static Optional<Bucket> getBucket(String bucketName) {
         try {
@@ -212,13 +209,12 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
-     *      根据bucket名称删除bucket
      * @param [bucketName]
-     * @date 2020/10/13
      * @return void
      * @throws
+     * @author Seven Lee
+     * @description 根据bucket名称删除bucket
+     * @date 2020/10/13
      **/
     public static void removeBucket(String bucketName) {
         try {
@@ -247,12 +243,12 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
      * @param [bucketName, prefix(前缀), recursive(是否递归)]
-     * @date 2020/10/13
      * @return java.util.List<io.minio.messages.Item>
      * @throws
+     * @author Seven Lee
+     * @description
+     * @date 2020/10/13
      **/
     public static List<Item> getAllObjectsByPrefix(String bucketName, String prefix, boolean recursive) {
         List<Item> objectList = new ArrayList<Item>();
@@ -288,13 +284,12 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
-     *      获取文件链接
      * @param [bucketName, fileName(文件名称), expires(失效时间)]
-     * @date 2020/10/13
      * @return java.lang.String
      * @throws
+     * @author Seven Lee
+     * @description 获取文件链接
+     * @date 2020/10/13
      **/
     public static String getObjectURL(String bucketName, String fileName, Integer expires) {
         try {
@@ -328,27 +323,30 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
-     *      文件下载
      * @param [bucketName, fileName(文件名称), response(响应)]
-     * @date 2020/10/13
      * @return void
      * @throws
+     * @author Seven Lee
+     * @description 文件下载
+     * @date 2020/10/13
      **/
-    public static void download(String bucketName, String fileName, HttpServletResponse response) {
+    public static void download(String bucketName, String fileName) {
         // 获取对象的元数据
         try {
-            final ObjectStat stat = minioClient.statObject(StatObjectArgs.builder().bucket(bucketName)
+            minioClient.downloadObject(DownloadObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(fileName)
+                    .build());
+            /*final ObjectStat stat = minioClient.statObject(StatObjectArgs.builder().bucket(bucketName)
                     .object(fileName).build());
             response.setContentType(stat.contentType());
             response.setCharacterEncoding(UTF8_ENCODING);
             response.setHeader(CONTENT_DISPOSITION, ATTACHMENT_AND + URLEncoder.encode(fileName, UTF8_ENCODING));
-            InputStream is =minioClient.getObject(GetObjectArgs.builder()
+            InputStream is = minioClient.getObject(GetObjectArgs.builder()
                     .bucket(bucketName)
                     .object(fileName).build());
             IOUtils.copy(is, response.getOutputStream());
-            is.close();
+            is.close();*/
         } catch (ErrorResponseException e) {
             e.printStackTrace();
         } catch (InsufficientDataException e) {
@@ -373,13 +371,12 @@ public class MinioUtils {
     }
 
     /**
-     * @author Seven Lee
-     * @description
-     *      获取文件信息
      * @param [bucketName, fileName(文件名)]
-     * @date 2020/10/13
      * @return io.minio.ObjectStat
      * @throws
+     * @author Seven Lee
+     * @description 获取文件信息
+     * @date 2020/10/13
      **/
     public static ObjectStat getObjectInfo(String bucketName, String fileName) {
         try {
@@ -412,15 +409,14 @@ public class MinioUtils {
 
 
     /**
-     * @author Seven Lee
-     * @description
-     *      文件上传
-     * @param [bucketName, fileName, inputStream, objectSize, partSize]
-     * @date 2020/10/13
+     * @param [bucketName, fileName, inputStream, objectSize, partSize, contentType]
      * @return void
      * @throws
+     * @author Seven Lee
+     * @description 文件上传
+     * @date 2020/10/15
      **/
-    public static void upload(String bucketName, String fileName, InputStream inputStream, Long objectSize, Long partSize) {
+    public static Boolean upload(String bucketName, String fileName, String contentType) {
 
         /**
          * 注意:
@@ -432,11 +428,13 @@ public class MinioUtils {
          *  </ul>
          *  A valid part size is between 5MiB to 5GiB (both limits inclusive)
          */
+        ObjectWriteResponse objectWriteResponse = null;
         try {
-            minioClient.putObject(PutObjectArgs.builder()
+            objectWriteResponse = minioClient.uploadObject(UploadObjectArgs.builder()
+                    .contentType(contentType)
                     .bucket(bucketName)
                     .object(fileName)
-                    .stream(inputStream, objectSize, partSize).build());
+                    .build());
         } catch (ErrorResponseException e) {
             e.printStackTrace();
         } catch (InsufficientDataException e) {
@@ -458,6 +456,11 @@ public class MinioUtils {
         } catch (XmlParserException e) {
             e.printStackTrace();
         }
+        String object = objectWriteResponse.object();
+        if(object.equals(fileName)) {
+            return true;
+        }
+        return false;
     }
 
 }
