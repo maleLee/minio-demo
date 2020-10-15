@@ -330,11 +330,12 @@ public class MinioUtils {
      * @description 文件下载
      * @date 2020/10/13
      **/
-    public static void download(String bucketName, String fileName) {
+    public static void download(String bucketName, String fileName, String filePath) {
         // 获取对象的元数据
         try {
             minioClient.downloadObject(DownloadObjectArgs.builder()
                     .bucket(bucketName)
+                    .filename(filePath)
                     .object(fileName)
                     .build());
             /*final ObjectStat stat = minioClient.statObject(StatObjectArgs.builder().bucket(bucketName)
@@ -416,7 +417,7 @@ public class MinioUtils {
      * @description 文件上传
      * @date 2020/10/15
      **/
-    public static Boolean upload(String bucketName, String fileName, String contentType) {
+    public static Boolean upload(String bucketName, String fileName, String filePath, String contentType) {
 
         /**
          * 注意:
@@ -433,6 +434,7 @@ public class MinioUtils {
             objectWriteResponse = minioClient.uploadObject(UploadObjectArgs.builder()
                     .contentType(contentType)
                     .bucket(bucketName)
+                    .filename(filePath)
                     .object(fileName)
                     .build());
         } catch (ErrorResponseException e) {
