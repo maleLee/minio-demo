@@ -22,19 +22,19 @@ public class TestController {
     @GetMapping("/upload")
     public String upload() {
         String bucketName = "test-1";
-        String filePath = "D:\\system\\Downloads\\software\\office2019\\cn_office_professional_plus_2019_x86_x64_dvd_5e5be643.iso";
-        String fileName = "cn_office_professional_plus_2019_x86_x64_dvd_5e5be643";
-        String contentType = ".iso";
+        String filePath = "D:\\workspace\\learn\\minio-demo\\minio-demo.iml";
+        String fileName = "minio";
+        String contentType = ".iml";
         Boolean upload = MinioUtils.upload(bucketName, fileName, filePath, contentType);
         System.out.println(upload);
         return "";
     }
 
-    @GetMapping("/d")
+    @GetMapping("/download")
     public String download() {
         String bucketName = "test-1";
-        String filePath = "D:\\system\\Downloads\\software\\office2019\\abc.iso";
-        String fileName = "cn_office_professional_plus_2019_x86_x64_dvd_5e5be643.iso";
+        String filePath = "D:\\workspace\\learn\\minio-demo\\111.iml";
+        String fileName = "minio";
         MinioUtils.download(bucketName, fileName, filePath);
         return "";
     }
